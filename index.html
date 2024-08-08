@@ -47,6 +47,7 @@
         .container > .name_box > .name {
             letter-spacing: 4vh;
             text-indent: 4vh;
+            user-select:none;
         }
 
         .container > .set {
@@ -55,6 +56,7 @@
             top: 3vw;
             font-size: 2vw;
             cursor: pointer;
+            user-select:none;
         }
 
         .pageSet {
@@ -67,6 +69,7 @@
             backdrop-filter: blur(4px);
             
             z-index: 999;
+            user-select:none;
         }
 
         .pageSet > .arrContainer {
@@ -109,6 +112,7 @@
         .pageSet > .arrContainer .item > input {
             border: none;
             outline: none;
+            width: 100%;
             font-size: 20px;
             font-weight: 700;
             color: #595959;
@@ -132,7 +136,7 @@
                 transform-origin: center center;
                 transform: rotate(90deg);
                 font-size: 10vh;
-
+                user-select:none;
             }
 
             .container > .set {
@@ -213,7 +217,10 @@
     // 返回
     const backEl = pageSetEl.querySelector(".back")
 
-
+    // 展示数据设置页
+    function showPageSet() {
+        pageSetEl.style.display = "block"
+    }
     // 创建item元素
     function createItem(value = "") {
         const itemEl = document.createElement("div")
@@ -267,9 +274,7 @@
             render(preTimeStamp)
         })
         // 设置点击事件监听
-        setEl.addEventListener("click", () => {
-            pageSetEl.style.display = "block"
-        })
+        setEl.addEventListener("click", showPageSet)
         //新增
         addEl.addEventListener("click", () => createItem())
         // 返回

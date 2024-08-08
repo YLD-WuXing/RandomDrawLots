@@ -247,7 +247,7 @@
     // 页面数据初始化
     function dataInit() {
         names = JSON.parse(localStorage.getItem("namesArr"))
-        if (names === null && names.length === 0) {
+        if (names === null || names.length === 0) {
             alert("当前无数据，请点击卡片右上角设置图标新增数据")
         } else {
             pageSetContentEl.innerHTML = ""

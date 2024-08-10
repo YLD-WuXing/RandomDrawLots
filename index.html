@@ -77,7 +77,6 @@
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
 
-
             /*safari 兼容*/
             -webkit-backdrop-filter: blur(4px);
 
@@ -94,6 +93,7 @@
             height: 100%;
             color: #595959;
             background: #d7d7d7;
+
         }
 
         .pageSet > .arrContainer > .top > .title {
@@ -103,13 +103,19 @@
             -webkit-user-select: none;
         }
 
-        .pageSet > .arrContainer > .top > .back {
+        .pageSet > .arrContainer > .top > .back,
+        .pageSet > .arrContainer > .top > .clear {
             position: absolute;
             left: 22px;
             top: 34px;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
+        }
+        .pageSet > .arrContainer > .top > .clear{
+            left: auto;
+            right: 22px;
+
         }
 
         .pageSet > .arrContainer > .content {
@@ -206,10 +212,11 @@
 <div class="pageSet">
     <div class="arrContainer hideScroll">
         <div class="top">
+            <div class="back">返回</div>
             <h2 class="title">
                 当前数据
             </h2>
-            <div class="back">返回</div>
+            <div class="clear">清空数据</div>
         </div>
         <form action="#" class="content">
         </form>
@@ -250,11 +257,13 @@
     const setEl = document.querySelector(".set")
     const pageSetEl = document.querySelector(".pageSet")
     // 存放抽签数据的容器
-    const pageSetContentEl = pageSetEl.querySelector((".content"))
+    const pageSetContentEl = pageSetEl.querySelector(".content")
     // 新增
     const addEl = pageSetEl.querySelector(".item.add")
     // 返回
     const backEl = pageSetEl.querySelector(".back")
+    // 清空数据
+    const clearEl = pageSetEl.querySelector(".clear")
 
     // 展示数据设置页
     function showPageSet() {
@@ -280,7 +289,7 @@
     }
 
     // 获取设置页的非空输入框内容
-    function getNames() {
+    function getSetPageNames() {
         const allTextareaEl = pageSetContentEl.querySelectorAll("textarea")
         const namesArr = []
         for (let el of allTextareaEl) {
@@ -305,14 +314,27 @@
         nameEl.textContent = ""
     }
 
+    // 抽签数据容器清空
+    function pageSetContentClear() {
+        pageSetContentEl.innerHTML = ""
+    }
+
+    // 数据持久化
+    function setNamesArr(namesArr = []) {
+        localStorage.setItem("namesArr", JSON.stringify(namesArr))
+    }
+    // 获取数据
+    function getNamesArr() {
+        return JSON.parse(localStorage.getItem("namesArr"))
+    }
     // 页面数据初始化
     function dataInit() {
         // 获取本地数据
-        names = JSON.parse(localStorage.getItem("namesArr"))
+        names = getNamesArr()
         if (names === null || names.length === 0) {
             alert("当前无数据，请点击卡片右上角设置图标新增数据")
         } else {
-            pageSetContentEl.innerHTML = ""
+            pageSetContentClear()
             nameEl.textContent = names[0]
             for (let name of names) {
                 createItem(name)
@@ -320,6 +342,7 @@
         }
 
     }
+
 
     // 注册事件
     function RegEvent() {
@@ -334,16 +357,24 @@
         addEl.addEventListener("click", () => createItem())
         // 点击返回
         backEl.addEventListener("click", () => {
-            const namesArr = getNames()
-            // 内容持久化
-            localStorage.setItem("namesArr", JSON.stringify(namesArr))
+            const namesArr = getSetPageNames()
+            // 数据持久化
+            setNamesArr(namesArr)
             // 隐藏设置页面
             pageSetEl.style.display = "none"
 
             // 如果当前编辑为非空数组
             if (namesArr.length !== 0) dataInit()
-            else resetInfo()
+            else {
+                pageSetContentClear()
+                resetInfo()
+            }
 
+        })
+        // 清空数据
+        clearEl.addEventListener("click", () => {
+            pageSetContentClear() // 清除页面上的元素
+            setNamesArr() //设置locaStorage
         })
 
     }

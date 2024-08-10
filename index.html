@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>随机抽签</title>
     <style>
         body {
             margin: 0;
@@ -32,6 +32,8 @@
             justify-content: center;
             align-items: center;
 
+            box-sizing: border-box;
+            padding: 20px;
             border-radius: 20px;
             height: 100%;
             box-shadow: rgba(0, 0, 0, 0.14) 0px 0px 14px 10px;
@@ -45,9 +47,14 @@
         }
 
         .container > .name_box > .name {
+            flex-shrink: 0;
+
+            box-sizing: border-box;
+            padding-left: 4vh;
+            width: 100%;
             letter-spacing: 4vh;
-            text-indent: 4vh;
-            user-select:none;
+            white-space: pre-wrap;
+            user-select: none;
             -webkit-user-select: none;
         }
 
@@ -57,7 +64,7 @@
             top: 3vw;
             font-size: 2vw;
             cursor: pointer;
-            user-select:none;
+            user-select: none;
             -webkit-user-select: none;
         }
 
@@ -69,15 +76,12 @@
             font-weight: 700;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
-<<<<<<< HEAD
-            -webkit-backdrop-filter: blur(4px);
-=======
-            -webkit-backdrop-filter: blur(4px)
->>>>>>> dca62f074f2d5d4cda3cf7158382dfa29ef8f4ab
+            /*  */
+            /*-webkit-backdrop-filter: blur(4px);*/
+
 
             z-index: 999;
-            user-select:none;
-            -webkit-user-select: none;
+
         }
 
         .pageSet > .arrContainer {
@@ -89,11 +93,14 @@
             height: 100%;
             color: #595959;
             background: #d7d7d7;
+
         }
 
         .pageSet > .arrContainer > .top > .title {
             text-align: center;
             font-weight: 500;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .pageSet > .arrContainer > .top > .back {
@@ -101,6 +108,8 @@
             left: 22px;
             top: 34px;
             cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .pageSet > .arrContainer > .content {
@@ -117,14 +126,16 @@
             cursor: pointer;
         }
 
-        .pageSet > .arrContainer .item > input {
+        .pageSet > .arrContainer .item > textarea {
             border: none;
             outline: none;
             width: 100%;
             font-size: 20px;
             font-weight: 700;
             color: #595959;
+            resize: none;
             background: transparent;
+            font-family: 'Microsoft YaHei', 'Arial', 'Helvetica', 'sans-serif';
         }
 
         .pageSet > .arrContainer .item.add {
@@ -132,19 +143,25 @@
             font-size: 20px;
         }
 
+        .pageSet > .arrContainer > .remark {
+            font-size: 1vw;
+            text-align: center;
+        }
+
         /*移动端适配*/
         @media (orientation: portrait) {
             .container {
                 height: 80vh;
                 width: 80vw;
-
+                transform: translate(-50%, -50%) scale(1.2);
             }
 
             .container > .name_box > .name {
+                width: 80vh;
+                font-size: 10vh;
                 transform-origin: center center;
                 transform: rotate(90deg);
-                font-size: 10vh;
-                user-select:none;
+                user-select: none;
                 -webkit-user-select: none;
             }
 
@@ -163,32 +180,45 @@
             }
         }
     </style>
+    <style>
+        /*公共样式*/
+        .hideScroll {
+            overflow: auto;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
 
+        .hideScroll::-webkit-scrollbar {
+            display: none; /*  Chrome、Safari 和 Opera   */
+        }
+    </style>
 </head>
 
 <body>
 <div class="container">
     <div class="name_box">
-        <span class="name"></span>
+        <div class="name"></div>
     </div>
     <div class="set">
         设置
     </div>
 </div>
 <div class="pageSet">
-    <div class="arrContainer">
+    <div class="arrContainer hideScroll">
         <div class="top">
             <h2 class="title">
                 当前数据
             </h2>
             <div class="back">返回</div>
         </div>
-
-
-        <div class="content">
-
-        </div>
+        <form action="#" class="content">
+        </form>
         <div class="item add">新增</div>
+        <div class="remark">
+            <div>添加完成后点击左上角返回即可</div>
+            <div>注意：单条数据建议10字以下,否则可能导致手机端溢出</div>
+            <div>多条数据导入在同一输入框内换行区分即可</div>
+        </div>
     </div>
 </div>
 </body>
@@ -197,7 +227,7 @@
     // 抽奖总名单
     let names;
     // 配置动画执行间隔时间 1帧(60帧屏幕)
-    const delayTime = 16.7 * 1
+    const delayTime = 16.7 * 2
 
     // 抽奖动画控制
     let isRender = false
@@ -230,38 +260,54 @@
     function showPageSet() {
         pageSetEl.style.display = "block"
     }
+
     // 创建item元素
     function createItem(value = "") {
         const itemEl = document.createElement("div")
         itemEl.className = "item"
 
-        const inputEl = document.createElement("input")
-        inputEl.type = "text"
-        inputEl.value = value
-        itemEl.append(inputEl)
+        const textareaEl = document.createElement("textarea")
+        textareaEl.rows = 1
+        textareaEl.value = value
+        textareaEl.className = "hideScroll"
+        textareaEl.addEventListener("input", function (e) {
+            this.style.height = '0px';
+            this.style.height = e.target.scrollHeight + 'px';
+        })
+        itemEl.append(textareaEl)
         pageSetContentEl.append(itemEl)
-        inputEl.focus()
+        textareaEl.focus()
     }
 
     // 获取设置页的非空输入框内容
-    function getNames () {
-        const allInputEl = pageSetContentEl.querySelectorAll("input")
+    function getNames() {
+        const allTextareaEl = pageSetContentEl.querySelectorAll("textarea")
         const namesArr = []
-        for (let el of allInputEl) {
+        for (let el of allTextareaEl) {
             const value = el.value
-            if (value !== "") namesArr.push(value)
+            if (value !== "") {
+                // 分割换行
+                const arr = value.split("\n")
+                for (let name of arr) {
+                    if (name !== "") {
+                        namesArr.push(name)
+                    }
+                }
+                console.log(namesArr)
+            }
         }
         return namesArr
     }
 
     // 重置抽签框的内容
-    function resetInfo () {
+    function resetInfo() {
         names = []
         nameEl.textContent = ""
     }
 
     // 页面数据初始化
     function dataInit() {
+        // 获取本地数据
         names = JSON.parse(localStorage.getItem("namesArr"))
         if (names === null || names.length === 0) {
             alert("当前无数据，请点击卡片右上角设置图标新增数据")
@@ -284,9 +330,9 @@
         })
         // 设置点击事件监听
         setEl.addEventListener("click", showPageSet)
-        //新增
+        // 点击新增
         addEl.addEventListener("click", () => createItem())
-        // 返回
+        // 点击返回
         backEl.addEventListener("click", () => {
             const namesArr = getNames()
             // 内容持久化
